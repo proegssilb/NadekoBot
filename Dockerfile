@@ -1,4 +1,4 @@
-FROM microsoft/dotnet:sdk
+FROM microsoft/dotnet:1.0.5-sdk
 MAINTAINER Poag <poag@gany.net>
 
 WORKDIR /opt/
@@ -15,6 +15,17 @@ RUN curl -L https://github.com/Kwoth/NadekoBot-BashScript/raw/master/nadeko_inst
 	&& curl -L https://github.com/Kwoth/NadekoBot-BashScript/raw/master/nadeko_autorestart.sh > nadeko.sh \
 	&& chmod 755 nadeko.sh
 
-VOLUME ["/opt"]
+#Apply pogogr customizations
+COPY ./* /opt/NadekoBotNew/
+RUN mv /opt/NadekoBot /opt/NadekoBotOld \
+	&& mv /opt/NadekoBotNew /opt/NadekoBot \
+	&& pushd NadekoBot \
+	&& dotnet restore \
+	&& popd \
+	&& mkdir nadekoData \
+	&& ln -sf /opt/nadekoData/NadekoBot.db /opt/NadekoBot/src/NadekoBot/data/NadekoBot.db \
+	&& ln -sf /opt/nadekoData/credentials.json /opt/NadekoBot/src/NadekoBot/credentials.json
+
+VOLUME ["/opt/nadekoData"]
 
 CMD ["/opt/nadeko.sh"]
