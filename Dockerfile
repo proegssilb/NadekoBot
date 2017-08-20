@@ -22,8 +22,9 @@ RUN mv /opt/NadekoBot /opt/NadekoBotOld \
 	&& mv /opt/NadekoBotNew /opt/NadekoBot \
 	&& cd NadekoBot \
 	&& dotnet restore \
+	&& cd src/NadekoBot
 	&& dotnet build -c Release \
-	&& cd .. \
+	&& cd /opt \
 	&& touch /opt/nadekoData/NadekoBot.db \
 	&& touch /opt/nadekoData/credentials.json \
 	&& ln -sf /opt/nadekoData/NadekoBot.db /opt/NadekoBot/src/NadekoBot/data/NadekoBot.db \
