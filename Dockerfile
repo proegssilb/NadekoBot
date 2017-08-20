@@ -19,9 +19,9 @@ RUN curl -L https://github.com/Kwoth/NadekoBot-BashScript/raw/master/nadeko_inst
 COPY ./* /opt/NadekoBotNew/
 RUN mv /opt/NadekoBot /opt/NadekoBotOld \
 	&& mv /opt/NadekoBotNew /opt/NadekoBot \
-	&& pushd NadekoBot \
+	&& cd NadekoBot \
 	&& dotnet restore \
-	&& popd \
+	&& cd .. \
 	&& mkdir nadekoData \
 	&& ln -sf /opt/nadekoData/NadekoBot.db /opt/NadekoBot/src/NadekoBot/data/NadekoBot.db \
 	&& ln -sf /opt/nadekoData/credentials.json /opt/NadekoBot/src/NadekoBot/credentials.json
