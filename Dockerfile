@@ -16,6 +16,7 @@ RUN curl -L https://github.com/Kwoth/NadekoBot-BashScript/raw/master/nadeko_inst
 	&& chmod 755 nadeko.sh
 
 #Apply pogogr customizations
+VOLUME ["/opt/nadekoData"]
 COPY ./* /opt/NadekoBotNew/
 RUN mv /opt/NadekoBot /opt/NadekoBotOld \
 	&& mv /opt/NadekoBotNew /opt/NadekoBot \
@@ -23,9 +24,9 @@ RUN mv /opt/NadekoBot /opt/NadekoBotOld \
 	&& dotnet restore \
 	&& cd .. \
 	&& mkdir nadekoData \
+	&& touch /opt/nadekoData/NadekoBot.db \
+	&& touch /opt/nadekoData/credentials.json \
 	&& ln -sf /opt/nadekoData/NadekoBot.db /opt/NadekoBot/src/NadekoBot/data/NadekoBot.db \
 	&& ln -sf /opt/nadekoData/credentials.json /opt/NadekoBot/src/NadekoBot/credentials.json
-
-VOLUME ["/opt/nadekoData"]
 
 CMD ["/opt/nadeko.sh"]
