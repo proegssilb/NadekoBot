@@ -17,7 +17,7 @@ RUN curl -L https://github.com/Kwoth/NadekoBot-BashScript/raw/master/nadeko_inst
 
 #Apply pogogr customizations
 VOLUME ["/opt/nadekoData"]
-COPY ./NadekoBot/* /opt/NadekoBotNew/
+ADD . /opt/NadekoBotNew/
 RUN mv /opt/NadekoBot /opt/NadekoBotOld \
 	&& mv /opt/NadekoBotNew /opt/NadekoBot \
 	&& cd NadekoBot \
