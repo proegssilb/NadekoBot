@@ -22,6 +22,7 @@ RUN mv /opt/NadekoBot /opt/NadekoBotOld \
 	&& mv /opt/NadekoBotNew /opt/NadekoBot \
 	&& cd NadekoBot \
 	&& dotnet restore \
+	&& cp Procfile ../ \
 	&& cd /opt \
 	&& touch /opt/nadekoData/NadekoBot.db \
 	&& touch /opt/nadekoData/credentials.json \
