@@ -34,7 +34,7 @@ namespace NadekoBot.Modules.Uptime.Services
             _activeChannels = uow.UptimeChannels.GetEnabled().ToList();
             _client.MessageUpdated += HandleMessageUpdated;
             _client.MessageReceived += HandleMessageReceived;
-            _log.Info("Logging channgels: {0}", String.Join(",", _activeChannels.Select(c => c.ChannelId)));
+            // _log.Info("Logging channgels: {0}", String.Join(",", _activeChannels.Select(c => c.ChannelId)));
         }
 
         public void EnableChannel(UptimeChannel channel)
@@ -60,10 +60,7 @@ namespace NadekoBot.Modules.Uptime.Services
         private Task HandleMessageUpdated(Cacheable<IMessage, ulong> optmsg, SocketMessage imsg2, ISocketMessageChannel ch)
         {
             if(!_activeChannels.Any(chan => chan.ChannelId == ch.Id && chan.Enabled)) return Task.CompletedTask;
-            var _ = Task.Run( () => {
-                _log.Warn(imsg2.Content.ToString());
-                _log.Warn(optmsg.HasValue ? optmsg.Value.Content.ToString() : "No value for `optmsg`");
-            });
+            // var _ = Task.Run( () => {});
             return Task.CompletedTask;
         }
 
@@ -74,12 +71,12 @@ namespace NadekoBot.Modules.Uptime.Services
             var chan = msg?.Channel as ITextChannel;
             if (msg == null || chan == null)
             {
-                _log.Info("Null message or channel.");
+                // _log.Info("Null message or channel.");
                 return Task.CompletedTask;
             }
             if (!_activeChannels.Any(ch => chan.Id == ch.ChannelId && ch.Enabled))
             {
-                _log.Info("No matching channels.");
+                // _log.Info("No matching channels.");
                 return Task.CompletedTask;
             }
             var _ = Task.Run(async () =>
@@ -114,10 +111,8 @@ namespace NadekoBot.Modules.Uptime.Services
                         uow.UptimeLog.Add(logEntry);
                         await uow.CompleteAsync().ConfigureAwait(false);
                     }
-                    _log.Info($"Found pokemon {pokemon} at ({lat}, {lng})");
                 }
             });
-            _log.Info("Finished processing receive.");
             return Task.CompletedTask;
         }
     }
