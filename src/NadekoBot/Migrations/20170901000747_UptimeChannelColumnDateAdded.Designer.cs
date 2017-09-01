@@ -9,9 +9,10 @@ using NadekoBot.Services.Database.Models;
 namespace NadekoBot.Migrations
 {
     [DbContext(typeof(NadekoContext))]
-    partial class NadekoSqliteContextModelSnapshot : ModelSnapshot
+    [Migration("20170901000747_UptimeChannelColumnDateAdded")]
+    partial class UptimeChannelColumnDateAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.1");
@@ -1249,29 +1250,6 @@ namespace NadekoBot.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UptimeChannel");
-                });
-
-            modelBuilder.Entity("NadekoBot.Services.Database.Models.UptimeLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<ulong>("ChannelId");
-
-                    b.Property<DateTime?>("DateAdded");
-
-                    b.Property<ulong>("GuildId");
-
-                    b.Property<decimal>("Lattitude");
-
-                    b.Property<decimal>("Longitude");
-
-                    b.Property<string>("Pokemon")
-                        .HasMaxLength(64);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UptimeLog");
                 });
 
             modelBuilder.Entity("NadekoBot.Services.Database.Models.UserPokeTypes", b =>

@@ -57,6 +57,12 @@ namespace NadekoBot.Services.Database
         private IWarningsRepository _warnings;
         public IWarningsRepository Warnings => _warnings ?? (_warnings = new WarningsRepository(_context));
 
+        private IUptimeRepository _uptimeRepository;
+        public IUptimeRepository UptimeChannels => _uptimeRepository ?? (_uptimeRepository = new UptimeRepository(_context));
+
+        private IUptimeLogRepository _uptimeLogRepository;
+        public IUptimeLogRepository UptimeLog => _uptimeLogRepository ?? (_uptimeLogRepository = new UptimeLogRepository(_context));
+
         public UnitOfWork(NadekoContext context)
         {
             _context = context;

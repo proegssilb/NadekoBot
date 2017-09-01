@@ -54,6 +54,8 @@ namespace NadekoBot.Services.Database
         public DbSet<RaceAnimal> RaceAnimals { get; set; }
         public DbSet<ModulePrefix> ModulePrefixes { get; set; }
         public DbSet<RewardedUser> RewardedUsers { get; set; }
+        public DbSet<UptimeChannel> UptimeChannels { get; set; }
+        public DbSet<UptimeLog> UptimeLog { get; set; }
 
         public NadekoContext() : base()
         {
