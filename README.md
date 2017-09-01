@@ -6,5 +6,6 @@ No support is offered. Use at your own risk.
 
 Summary of changes:
 
-  - Modify Dockerfile for use in Dokku
+  - Modify Dockerfile for use in production with reboots.
+  - Add uptime logging, see the `Uptime` module.
   - More to come
