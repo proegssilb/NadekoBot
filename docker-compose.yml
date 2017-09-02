@@ -3,4 +3,5 @@ services:
   bot:
     build: .
     volumes:
-      - "/mnt/vols/nadeko:/opt/nadekoData"
+      - "/mnt/vols/nadeko/NadekoBot.db:/opt/NadekoBot/NadekoBot.db"
+      - "/mnt/vols/nadeko-creds/credentials.json:/opt/NadekoBot/src/NadekoBot/credentials.json"
