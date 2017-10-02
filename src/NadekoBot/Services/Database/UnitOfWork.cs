@@ -62,6 +62,12 @@ namespace NadekoBot.Services.Database
 
         private IUptimeLogRepository _uptimeLogRepository;
         public IUptimeLogRepository UptimeLog => _uptimeLogRepository ?? (_uptimeLogRepository = new UptimeLogRepository(_context));
+        
+        private IXpRepository _xp;
+        public IXpRepository Xp => _xp ?? (_xp = new XpRepository(_context));
+        
+        private IClubRepository _clubs;
+        public IClubRepository Clubs => _clubs ?? (_clubs = new ClubRepository(_context));
 
         public UnitOfWork(NadekoContext context)
         {
