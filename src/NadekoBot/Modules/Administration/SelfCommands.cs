@@ -30,15 +30,20 @@ namespace NadekoBot.Modules.Administration
             private readonly IImagesService _images;
             private readonly MusicService _music;
             private readonly IBotConfigProvider _bc;
+            private readonly NadekoBot _bot;
+            private readonly IBotCredentials _creds;
 
-            public SelfCommands(DbService db, DiscordSocketClient client,
-                MusicService music, IImagesService images, IBotConfigProvider bc)
+            public SelfCommands(DbService db, NadekoBot bot, DiscordSocketClient client,
+                MusicService music, IImagesService images, IBotConfigProvider bc,
+                IBotCredentials creds)
             {
                 _db = db;
                 _client = client;
                 _images = images;
                 _music = music;
                 _bc = bc;
+                _bot = bot;
+                _creds = creds;
             }
 
             [NadekoCommand, Usage, Description, Aliases]
@@ -280,6 +285,22 @@ namespace NadekoBot.Modules.Administration
 
             [NadekoCommand, Usage, Description, Aliases]
             [OwnerOnly]
+            public async Task Restart()
+            {
+                var cmd = _creds.RestartCommand;
+                if (cmd == null || string.IsNullOrWhiteSpace(cmd.Cmd))
+                {
+                    await ReplyErrorLocalized("restart_fail").ConfigureAwait(false);
+                    return;
+                }
+
+                await ReplyConfirmLocalized("restarting").ConfigureAwait(false);
+                Process.Start(cmd.Cmd, cmd.Args);
+                Environment.Exit(0);
+            }
+
+            [NadekoCommand, Usage, Description, Aliases]
+            [OwnerOnly]
             public async Task SetName([Remainder] string newName)
             {
                 if (string.IsNullOrWhiteSpace(newName))
@@ -349,7 +370,7 @@ namespace NadekoBot.Modules.Administration
             [OwnerOnly]
             public async Task SetGame([Remainder] string game = null)
             {
-                await _client.SetGameAsync(game).ConfigureAwait(false);
+                await _bot.SetGameAsync(game).ConfigureAwait(false);
 
                 await ReplyConfirmLocalized("set_game").ConfigureAwait(false);
             }

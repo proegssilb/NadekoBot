@@ -58,8 +58,7 @@ namespace NadekoBot.Modules.CustomReactions
 
             if (channel == null)
             {
-                Array.Resize(ref _service.GlobalReactions, _service.GlobalReactions.Length + 1);
-                _service.GlobalReactions[_service.GlobalReactions.Length - 1] = cr;
+                await _service.AddGcr(cr).ConfigureAwait(false);
             }
             else
             {
@@ -79,6 +78,60 @@ namespace NadekoBot.Modules.CustomReactions
                 .AddField(efb => efb.WithName(GetText("trigger")).WithValue(key))
                 .AddField(efb => efb.WithName(GetText("response")).WithValue(message.Length > 1024 ? GetText("redacted_too_long") : message))
                 ).ConfigureAwait(false);
+        }
+
+        [NadekoCommand, Usage, Description, Aliases]
+        public async Task EditCustReact(int id, [Remainder] string message)
+        {
+            var channel = Context.Channel as ITextChannel;
+            if (string.IsNullOrWhiteSpace(message) || id < 0)
+                return;
+
+            if ((channel == null && !_creds.IsOwner(Context.User)) || (channel != null && !((IGuildUser)Context.User).GuildPermissions.Administrator))
+            {
+                await ReplyErrorLocalized("insuff_perms").ConfigureAwait(false);
+                return;
+            }
+
+            CustomReaction cr;
+            using (var uow = _db.UnitOfWork)
+            {
+                cr = uow.CustomReactions.Get(id);
+
+                if (cr != null)
+                {
+                    cr.Response = message;
+                    await uow.CompleteAsync().ConfigureAwait(false);
+                }
+            }
+
+            if (cr != null)
+            {
+                if (channel == null)
+                {
+                    await _service.EditGcr(id, message).ConfigureAwait(false);
+                }
+                else
+                {
+                    if (_service.GuildReactions.TryGetValue(Context.Guild.Id, out var crs))
+                    {
+                        var oldCr = crs.FirstOrDefault(x => x.Id == id);
+                        if (oldCr != null)
+                            oldCr.Response = message;
+                    }
+                }
+
+                await Context.Channel.EmbedAsync(new EmbedBuilder().WithOkColor()
+                    .WithTitle(GetText("edited_cust_react"))
+                    .WithDescription($"#{cr.Id}")
+                    .AddField(efb => efb.WithName(GetText("trigger")).WithValue(cr.Trigger))
+                    .AddField(efb => efb.WithName(GetText("response")).WithValue(message.Length > 1024 ? GetText("redacted_too_long") : message))
+                    ).ConfigureAwait(false);
+            }
+            else
+            {
+                await ReplyErrorLocalized("edit_fail").ConfigureAwait(false);
+            }
         }
 
         [NadekoCommand, Usage, Description, Aliases]
@@ -237,8 +290,7 @@ namespace NadekoBot.Modules.CustomReactions
                     if ((toDelete.GuildId == null || toDelete.GuildId == 0) && Context.Guild == null)
                     {
                         uow.CustomReactions.Remove(toDelete);
-                        //todo 91 i can dramatically improve performance of this, if Ids are ordered.
-                        _service.GlobalReactions = _service.GlobalReactions.Where(cr => cr?.Id != toDelete.Id).ToArray();
+                        await _service.DelGcr(toDelete.Id);
                         success = true;
                     }
                     else if ((toDelete.GuildId != null && toDelete.GuildId != 0) && Context.Guild.Id == toDelete.GuildId)
@@ -298,12 +350,8 @@ namespace NadekoBot.Modules.CustomReactions
                 }
 
                 var setValue = reaction.ContainsAnywhere = !reaction.ContainsAnywhere;
-
-                using (var uow = _db.UnitOfWork)
-                {
-                    uow.CustomReactions.Get(id).ContainsAnywhere = setValue;
-                    uow.Complete();
-                }
+                
+                await _service.SetCrCaAsync(reaction.Id, setValue).ConfigureAwait(false);
 
                 if (setValue)
                 {
@@ -350,11 +398,7 @@ namespace NadekoBot.Modules.CustomReactions
 
                 var setValue = reaction.DmResponse = !reaction.DmResponse;
 
-                using (var uow = _db.UnitOfWork)
-                {
-                    uow.CustomReactions.Get(id).DmResponse = setValue;
-                    uow.Complete();
-                }
+                await _service.SetCrDmAsync(reaction.Id, setValue).ConfigureAwait(false);
 
                 if (setValue)
                 {
@@ -400,12 +444,8 @@ namespace NadekoBot.Modules.CustomReactions
                 }
 
                 var setValue = reaction.AutoDeleteTrigger = !reaction.AutoDeleteTrigger;
-
-                using (var uow = _db.UnitOfWork)
-                {
-                    uow.CustomReactions.Get(id).AutoDeleteTrigger = setValue;
-                    uow.Complete();
-                }
+                
+                await _service.SetCrAdAsync(reaction.Id, setValue).ConfigureAwait(false);
 
                 if (setValue)
                 {
